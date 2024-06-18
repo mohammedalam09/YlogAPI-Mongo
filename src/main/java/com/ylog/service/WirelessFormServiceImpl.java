@@ -1,6 +1,12 @@
 package com.ylog.service;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,24 +104,24 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 
 //			if (form.getFormName().equalsIgnoreCase("Drop Down") ){
 
-				logger.info("Started In viewWirelessFormTemplates() Where formName: " + form.getFormName());
-				List<MultiSelectRequest> dropdownData = multiSelectRequestRepo.findByFormId(form.get_id());
-				logger.info("After getting dropdown list in viewWirelessFormTemplates() Where formName: "
-						+ form.getFormName());
-				form.getFormMetadata().stream().forEach(metadata -> {
+			logger.info("Started In viewWirelessFormTemplates() Where formName: " + form.getFormName());
+			List<MultiSelectRequest> dropdownData = multiSelectRequestRepo.findByFormId(form.get_id());
+			logger.info(
+					"After getting dropdown list in viewWirelessFormTemplates() Where formName: " + form.getFormName());
+			form.getFormMetadata().stream().forEach(metadata -> {
 
-					dropdownData.stream().forEach(data -> {
-						if (data.getUiLabelKey().equalsIgnoreCase(metadata.getUiLabelKey())) {
-							
-							if (null != data.getEntity()) {
-								data.setUrl(baseUrl+data.getUrl());
-							}
-							metadata.setMultiSelectRequest(data);
+				dropdownData.stream().forEach(data -> {
+					if (data.getUiLabelKey().equalsIgnoreCase(metadata.getUiLabelKey())) {
 
+						if (null != data.getEntity()) {
+							data.setUrl(baseUrl + data.getUrl());
 						}
-					});
+						metadata.setMultiSelectRequest(data);
 
+					}
 				});
+
+			});
 //			}
 
 		});
@@ -125,34 +131,58 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 
 	@Override
 	public ResponseEntity<Response> addWirelessFormSubmittedData(WirelessFormData wirelessFormData) {
-		// TODO Auto-generated method stub
-		return null;
+		if (null == wirelessFormData.getFormId() || wirelessFormData.getFormId().isEmpty())
+			return Response.buildResponse("FormId not found", HttpStatus.PRECONDITION_FAILED);
+		if (wfHelper.checkIfFormDeleted(wirelessFormData.getFormId()))
+			return Response.buildResponse("Form does not exists!!!", HttpStatus.PRECONDITION_FAILED);
+		wirelessFormData.setCreatedOn(DateTimeUtility.getGmtDateTime());
+		wirelessFormDataRepo.save(wirelessFormData);
+		return Response.buildResponse("Data Added Successfully", HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<Response> viewWirelessFormSubmittedData(String formId) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Map<String, Object>> list = new LinkedList<>();
+		if (wfHelper.checkIfFormDeleted(formId))
+			return Response.buildResponse("Form does not exists!!!", HttpStatus.PRECONDITION_FAILED);
+		List<Map<String, Object>> allFormData = wfHelper.getSubmittedDataList(formId);
+		List<String> labelNamesInSequence = wfHelper.getFormMetadata(formId);
+		allFormData.stream().forEach(data -> {
+				  Map<String, Object> map = new LinkedHashMap<>();
+		          labelNamesInSequence.stream().forEach( label -> {
+		        	  map.put(label, data.get(label));
+		          });
+			
+			list.add(map);
+		});
+		logger.info("End In DataTable: " + new Date());
+		if (list.isEmpty()) {
+			return Response.buildResponse(Arrays.asList(new Object[0]), HttpStatus.NO_CONTENT);
+		}
+		return Response.buildResponse(list, HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<Response> deleteForm(List<String> formIds) {
-		// TODO Auto-generated method stub
-		return null;
+		formIds.stream().forEach(id -> {
+			multiSelectRequestRepo.deleteAllById(multiSelectRequestRepo.findByFormId(id).stream().map( m->m.get_id()).collect(Collectors.toList()));  
+			wirelessFormTemplateRepo.deleteById(id);
+		});
+		return Response.buildResponse("Deleted Successfully", HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<Response> getAllTemplateList() {
-		// TODO Auto-generated method stub
-		return null;
+		return Response.buildResponse(wfHelper.getAllFormNames(), HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<Response> getFormMetadataByFormId(String formId) {
-		// TODO Auto-generated method stub
-		return null;
+		return Response.buildResponse(wirelessFormTemplateRepo.getFormMetadata(formId), HttpStatus.OK);
 	}
 
+//	------------------------------Not using now
+	
 	public ResponseEntity<Response> addCustomGroup(CustomGroupRequest customGroupRequest) throws Exception {
 		customGroupRepo.save(customGroupRequest);
 		return Response.buildResponse("Group Added Successfully", HttpStatus.OK);
