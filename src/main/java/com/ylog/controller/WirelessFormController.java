@@ -3,9 +3,12 @@ package com.ylog.controller;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +30,9 @@ import com.ylog.service.WirelessFormService;
 @RequestMapping("/wirelessForm")
 @CrossOrigin("*")
 public class WirelessFormController {
+	
+	@Value("${app.version}")
+	private String appVersion;
 
 	private static Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
 
@@ -34,7 +40,7 @@ public class WirelessFormController {
 	WirelessFormService wfService;
 
 	@PostMapping("/template/addForm")
-	public ResponseEntity<Response> addWirelessFormTemplate(@RequestBody WirelessRequest wirelessRequest)
+	public ResponseEntity<Response> addWirelessFormTemplate(@RequestBody @Valid WirelessRequest wirelessRequest)
 			throws Exception {
 		logger.info("Start In addWirelessFormTemplate()");
 
@@ -86,7 +92,7 @@ public class WirelessFormController {
 	@GetMapping("/version")
 	public ResponseEntity<Response> getversion() {
 
-		return Response.buildResponse("10-06-2024 15:42", HttpStatus.OK);
+		return Response.buildResponse(appVersion, HttpStatus.OK);
 	}
 
 //	------------------------------Not using now

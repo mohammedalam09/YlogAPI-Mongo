@@ -90,11 +90,12 @@ public class WirelessFormHelper {
 		wirelessRequest.getFormMetadata().forEach(f -> {
 
 			if (null == f.getSequence()) {
-
 				validationMap.put("error", "sequence should not be null");
-
 			}
-
+			if (f.getSequence().longValue() == 0l) {
+				validationMap.put("error", "sequence should be start from 1");
+			}
+			
 			else if (null == f.getLabel() || f.getLabel().isEmpty()) {
 
 				validationMap.put("error", "label should not be null or empty");

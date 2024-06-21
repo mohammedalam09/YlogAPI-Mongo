@@ -2,6 +2,8 @@ package com.ylog.entities;
 
 import java.util.List;
 
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +21,7 @@ public class WirelessRequest {
 	private String _id;
 	//private Long wirelessFormId;     //this is considering as PK here.
 	private Long companyId; 
+	@NotBlank(message = "should not be blank" )
 	private String formName;
 	private String description;
 	private List<String> assignRoleIds;

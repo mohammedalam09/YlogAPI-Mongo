@@ -2,6 +2,8 @@ package com.ylog.entities;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Transient;
 
 import lombok.Data;
@@ -10,6 +12,7 @@ import lombok.Data;
 public class WirelessFormMetaDataBean1 {
 	
 	//This key is used for maintaining the sequence of the field on form
+	@NotNull(message = "sequence can not be null")
 	private Long sequence;
 	//This key is used for field label
 	private String label;
