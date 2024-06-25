@@ -157,7 +157,7 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 		});
 		logger.info("End In DataTable: " + new Date());
 		if (list.isEmpty()) {
-			return Response.buildResponse(Arrays.asList(new Object[0]), HttpStatus.NO_CONTENT);
+			return Response.buildResponse(Arrays.asList(), HttpStatus.NO_CONTENT);
 		}
 		return Response.buildResponse(list, HttpStatus.OK);
 	}
