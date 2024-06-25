@@ -18,7 +18,7 @@ public interface WirelessFormService {
 
 	ResponseEntity<Response> addWirelessFormSubmittedData(WirelessFormData wirelessFormData);
 
-	ResponseEntity<Response> viewWirelessFormSubmittedData(String formId);
+	ResponseEntity<Response> viewWirelessFormSubmittedData(String formId,List<String> ascCols,List<String> descCols,Integer pageNo,Integer pageSize);
 	
 	ResponseEntity<Response> deleteForm(List<String> formIds);
 	

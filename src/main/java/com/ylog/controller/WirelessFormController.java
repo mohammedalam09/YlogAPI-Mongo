@@ -1,5 +1,6 @@
 package com.ylog.controller;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import com.ylog.service.WirelessFormService;
 @RequestMapping("/wirelessForm")
 @CrossOrigin("*")
 public class WirelessFormController {
-	
+
 	@Value("${app.version}")
 	private String appVersion;
 
@@ -75,11 +76,14 @@ public class WirelessFormController {
 	}
 
 	@GetMapping("/data/dataTable")
-	public ResponseEntity<Response> viewWirelessFormSubmittedData(@RequestParam String formId) {
+	public ResponseEntity<Response> viewWirelessFormSubmittedData(@RequestParam String formId,
+			@RequestParam(required = false, defaultValue = "") List<String> ascCols,
+			@RequestParam(required = false, defaultValue = "createdOn") List<String> descCols,
+			@RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize) {
 
 		logger.info("Start In DataTable: " + new Date());
 
-		return wfService.viewWirelessFormSubmittedData(formId);
+		return wfService.viewWirelessFormSubmittedData(formId, ascCols, descCols, pageNo, pageSize);
 
 	}
 

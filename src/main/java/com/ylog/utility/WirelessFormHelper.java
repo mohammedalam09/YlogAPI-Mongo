@@ -1,6 +1,7 @@
 package com.ylog.utility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -54,10 +56,39 @@ public class WirelessFormHelper {
 //				.collect(Collectors.toList());
 //	}
 
-	public List<Map<String, Object>> getSubmittedDataList(String formId) {
+	public List<Map<String, Object>> getSubmittedDataList(String formId, List<String> ascCols, List<String> descCols,
+			Integer pageNo, Integer pageSize) {
+
 		Query query = new Query(Criteria.where("formId").is(formId));
+
+		if (!ascCols.contains("createdOn")) {
+
+			if (!descCols.contains("createdOn")) {
+
+				ascCols.stream().forEach(a -> {
+
+					query.with(Sort.by(Sort.Direction.ASC, "formSubmittedData." + a));
+
+				});
+
+				descCols.stream().forEach(d -> {
+
+					query.with(Sort.by(Sort.Direction.DESC, "formSubmittedData." + d));
+				});
+
+			}
+
+		} else {
+
+			// default search with submittedOn desc
+			query.with(Sort.by(Sort.Direction.DESC, "createdOn"));
+		}
+
+		PageRequest page = PageRequest.of(pageNo, pageSize);
+
+		query.with(page);
+
 		query.fields().include("formSubmittedData");
-		query.with(Sort.by(Sort.Direction.DESC, "createdOn"));
 
 		return mongoTemplate.find(query, WirelessFormData.class).stream().map(WirelessFormData::getFormSubmittedData)
 				.toList();
@@ -95,7 +126,7 @@ public class WirelessFormHelper {
 			if (f.getSequence().longValue() == 0l) {
 				validationMap.put("error", "sequence should be start from 1");
 			}
-			
+
 			else if (null == f.getLabel() || f.getLabel().isEmpty()) {
 
 				validationMap.put("error", "label should not be null or empty");

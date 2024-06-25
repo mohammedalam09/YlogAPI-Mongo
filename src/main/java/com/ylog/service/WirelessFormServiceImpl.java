@@ -141,11 +141,11 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 	}
 
 	@Override
-	public ResponseEntity<Response> viewWirelessFormSubmittedData(String formId) {
+	public ResponseEntity<Response> viewWirelessFormSubmittedData(String formId,List<String> ascCols,List<String> descCols,Integer pageNo,Integer pageSize) {
 		List<Map<String, Object>> list = new LinkedList<>();
 		if (wfHelper.checkIfFormDeleted(formId))
 			return Response.buildResponse("Form does not exists!!!", HttpStatus.PRECONDITION_FAILED);
-		List<Map<String, Object>> allFormData = wfHelper.getSubmittedDataList(formId);
+		List<Map<String, Object>> allFormData = wfHelper.getSubmittedDataList(formId,ascCols, descCols, pageNo, pageSize);
 		List<String> labelNamesInSequence = wfHelper.getFormMetadata(formId);
 		allFormData.stream().forEach(data -> {
 				  Map<String, Object> map = new LinkedHashMap<>();
