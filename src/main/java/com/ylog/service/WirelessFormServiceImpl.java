@@ -1,7 +1,7 @@
 package com.ylog.service;
 
+import java.net.ConnectException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,10 +12,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ylog.data.Response;
 import com.ylog.entities.CustomGroupRequest;
 import com.ylog.entities.MultiSelectRequest;
@@ -27,8 +33,12 @@ import com.ylog.repo.MultiSelectRequestRepo;
 import com.ylog.repo.WirelessFormDataRepo;
 import com.ylog.repo.WirelessFormTemplateRepo;
 import com.ylog.service.sequence.SequenceService;
+import com.ylog.utility.Constants;
 import com.ylog.utility.DateTimeUtility;
+import com.ylog.utility.RedisService;
 import com.ylog.utility.WirelessFormHelper;
+
+import io.lettuce.core.RedisConnectionException;
 
 @Service
 public class WirelessFormServiceImpl implements WirelessFormService {
@@ -55,8 +65,13 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 	@Autowired
 	WirelessFormTemplateRepo wirelessFormTemplateRepo;
 
+	@Autowired
+	private RedisService redisService;
+
 	@Value("${base.uri}")
 	private String baseUrl;
+
+	int retry = 0;
 
 	public ResponseEntity<Response> addWirelessFormTemplate(WirelessRequest wirelessRequest) throws Exception {
 		logger.info("Start In addWirelessFormTemplate() Service");
@@ -141,21 +156,33 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 	}
 
 	@Override
-	public ResponseEntity<Response> viewWirelessFormSubmittedData(String formId,List<String> ascCols,List<String> descCols,Integer pageNo,Integer pageSize) {
+	public ResponseEntity<Response> viewWirelessFormSubmittedData(String formId, List<String> ascCols,
+			List<String> descCols, Integer pageNo, Integer pageSize) {
+		logger.info("Started In viewWirelessFormSubmittedData Service");
 		List<Map<String, Object>> list = new LinkedList<>();
-		if (wfHelper.checkIfFormDeleted(formId))
+
+		if (wfHelper.checkIfFormDeleted(formId)) {
 			return Response.buildResponse("Form does not exists!!!", HttpStatus.PRECONDITION_FAILED);
-		List<Map<String, Object>> allFormData = wfHelper.getSubmittedDataList(formId,ascCols, descCols, pageNo, pageSize);
+		}
+
+		if (ascCols.contains("createdOn") || descCols.contains("createdOn")) {
+			return Response.buildResponse("No such column Exists", HttpStatus.PRECONDITION_FAILED);
+		}
+
+		List<Map<String, Object>> allFormData = wfHelper.getSubmittedDataList(formId, ascCols, descCols, pageNo,
+				pageSize);
+
 		List<String> labelNamesInSequence = wfHelper.getFormMetadata(formId);
+
 		allFormData.stream().forEach(data -> {
-				  Map<String, Object> map = new LinkedHashMap<>();
-		          labelNamesInSequence.stream().forEach( label -> {
-		        	  map.put(label, data.get(label));
-		          });
-			
+			Map<String, Object> map = new LinkedHashMap<>();
+			labelNamesInSequence.stream().forEach(label -> {
+				map.put(label, data.get(label));
+			});
+
 			list.add(map);
 		});
-		logger.info("End In DataTable: " + new Date());
+		logger.info("Exit from viewWirelessFormSubmittedData Service");
 		if (list.isEmpty()) {
 			return Response.buildResponse(Arrays.asList(), HttpStatus.NO_CONTENT);
 		}
@@ -165,24 +192,78 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 	@Override
 	public ResponseEntity<Response> deleteForm(List<String> formIds) {
 		formIds.stream().forEach(id -> {
-			multiSelectRequestRepo.deleteAllById(multiSelectRequestRepo.findByFormId(id).stream().map( m->m.get_id()).collect(Collectors.toList()));  
+			multiSelectRequestRepo.deleteAllById(
+					multiSelectRequestRepo.findByFormId(id).stream().map(m -> m.get_id()).collect(Collectors.toList()));
 			wirelessFormTemplateRepo.deleteById(id);
 		});
 		return Response.buildResponse("Deleted Successfully", HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<Response> getAllTemplateList() {
+	@Retryable(value = RedisConnectionFailureException.class, maxAttempts = 3, recover = "getAllFormsFromDB", backoff = @Backoff(3000))
+	public ResponseEntity<Response> getAllTemplateList() throws Exception {
+
+		logger.info("Started In getAllTemplateList() Service ");
+
+		@SuppressWarnings("unchecked")
+		List<Map<String, Object>> cachedFormList = redisService.get(Constants.KEY_FORM_NAMES, List.class);
+
+		if (null != cachedFormList) {
+			logger.info("Started In getAllTemplateList() Service Data From cache");
+			return Response.buildResponse(cachedFormList, HttpStatus.OK);
+		}
+
+		logger.info("Started In getAllTemplateList() Service DB call");
+		List<Map<String, Object>> allFormNames = wfHelper.getAllFormNames();
+
+		if (!allFormNames.isEmpty()) {
+
+			try {
+				redisService.set(Constants.KEY_FORM_NAMES, new ObjectMapper().writeValueAsString(allFormNames), 5l);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		return Response.buildResponse(allFormNames, HttpStatus.OK);
+	}
+
+	@Recover
+	public ResponseEntity<Response> getAllFormsFromDB(RedisConnectionFailureException e) {
+		logger.info(
+				"Started In getFormMetadataByFormId() Service Recovery Method calling for exception" + e.getMessage());
 		return Response.buildResponse(wfHelper.getAllFormNames(), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<Response> getFormMetadataByFormId(String formId) {
-		return Response.buildResponse(wirelessFormTemplateRepo.getFormMetadata(formId), HttpStatus.OK);
+	public ResponseEntity<Response> getFormMetadataByFormId(String formId) throws Exception {
+		logger.info("Started In getFormMetadataByFormId() Service ");
+
+		WirelessRequest cachedFormData = redisService.get(formId, WirelessRequest.class);
+
+		if (null != cachedFormData) {
+			logger.info("Started In getFormMetadataByFormId() Service Data From cache");
+			return Response.buildResponse(cachedFormData, HttpStatus.OK);
+		}
+
+		logger.info("Started In getFormMetadataByFormId() Service DB call");
+		WirelessRequest dataFromDB = wirelessFormTemplateRepo.getFormMetadata(formId);
+
+		if (null != dataFromDB) {
+
+			try {
+				redisService.set(formId, new ObjectMapper().writeValueAsString(dataFromDB), 15l);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return Response.buildResponse(dataFromDB, HttpStatus.OK);
 	}
 
 //	------------------------------Not using now
-	
+
 	public ResponseEntity<Response> addCustomGroup(CustomGroupRequest customGroupRequest) throws Exception {
 		customGroupRepo.save(customGroupRequest);
 		return Response.buildResponse("Group Added Successfully", HttpStatus.OK);

@@ -18,17 +18,17 @@ public interface WirelessFormService {
 
 	ResponseEntity<Response> addWirelessFormSubmittedData(WirelessFormData wirelessFormData);
 
-	ResponseEntity<Response> viewWirelessFormSubmittedData(String formId,List<String> ascCols,List<String> descCols,Integer pageNo,Integer pageSize);
-	
+	ResponseEntity<Response> viewWirelessFormSubmittedData(String formId, List<String> ascCols, List<String> descCols,
+			Integer pageNo, Integer pageSize);
+
 	ResponseEntity<Response> deleteForm(List<String> formIds);
-	
-	ResponseEntity<Response> getAllTemplateList();
-	
-	ResponseEntity<Response> getFormMetadataByFormId(String formId);
-	
-	
-	ResponseEntity<Response> addCustomGroup(@RequestBody CustomGroupRequest customGroupRequest)throws Exception;
-	
+
+	ResponseEntity<Response> getAllTemplateList() throws Exception;
+
+	ResponseEntity<Response> getFormMetadataByFormId(String formId) throws Exception;
+
+	ResponseEntity<Response> addCustomGroup(@RequestBody CustomGroupRequest customGroupRequest) throws Exception;
+
 	ResponseEntity<Response> getCustomGroup();
 
 }

@@ -60,26 +60,19 @@ public class WirelessFormHelper {
 			Integer pageNo, Integer pageSize) {
 
 		Query query = new Query(Criteria.where("formId").is(formId));
+	
+		ascCols.stream().forEach(a -> {
 
-		if (!ascCols.contains("createdOn")) {
+			query.with(Sort.by(Sort.Direction.ASC, "formSubmittedData." + a));
 
-			if (!descCols.contains("createdOn")) {
+		});
 
-				ascCols.stream().forEach(a -> {
+		descCols.stream().forEach(d -> {
 
-					query.with(Sort.by(Sort.Direction.ASC, "formSubmittedData." + a));
+			query.with(Sort.by(Sort.Direction.DESC, "formSubmittedData." + d));
+		});
 
-				});
-
-				descCols.stream().forEach(d -> {
-
-					query.with(Sort.by(Sort.Direction.DESC, "formSubmittedData." + d));
-				});
-
-			}
-
-		} else {
-
+		if (ascCols.isEmpty() && descCols.isEmpty()) {
 			// default search with submittedOn desc
 			query.with(Sort.by(Sort.Direction.DESC, "createdOn"));
 		}

@@ -1,6 +1,5 @@
 package com.ylog.controller;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class WirelessFormController {
 	private static Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
 
 	@Autowired
-	WirelessFormService wfService;
+	private WirelessFormService wfService;
 
 	@PostMapping("/template/addForm")
 	public ResponseEntity<Response> addWirelessFormTemplate(@RequestBody @Valid WirelessRequest wirelessRequest)
@@ -59,13 +58,24 @@ public class WirelessFormController {
 	@GetMapping("/templateList")
 	public ResponseEntity<Response> getAllTemplateLists() {
 
-		return wfService.getAllTemplateList();
+		try {
+			return wfService.getAllTemplateList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return Response.buildResponse("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
 	@GetMapping("/template/metadata")
 	public ResponseEntity<Response> getFormMetadataByFormId(@RequestParam String formId) {
-		return wfService.getFormMetadataByFormId(formId);
+		try {
+			return wfService.getFormMetadataByFormId(formId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Response.buildResponse("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@PostMapping("/data/add")
@@ -78,7 +88,7 @@ public class WirelessFormController {
 	@GetMapping("/data/dataTable")
 	public ResponseEntity<Response> viewWirelessFormSubmittedData(@RequestParam String formId,
 			@RequestParam(required = false, defaultValue = "") List<String> ascCols,
-			@RequestParam(required = false, defaultValue = "createdOn") List<String> descCols,
+			@RequestParam(required = false, defaultValue = "") List<String> descCols,
 			@RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize) {
 
 		logger.info("Start In DataTable: " + new Date());
