@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -22,8 +23,9 @@ public class WirelessRequest {
 	@Id
 	private String _id;
 	//private Long wirelessFormId;     //this is considering as PK here.
+	@NotNull
 	private Long companyId; 
-	@NotBlank
+	@NotNull
 	@NotEmpty
 	private String formName;
 	private String description;
@@ -39,7 +41,7 @@ public class WirelessRequest {
 	private String actionType;
 	private String formCode;
 	private Boolean isPublicForm;
-	@NotBlank
+	@NotNull
 	@NotEmpty
 	private String createdBy;
 	private String createdOn;
