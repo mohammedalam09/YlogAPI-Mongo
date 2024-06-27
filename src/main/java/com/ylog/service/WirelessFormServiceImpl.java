@@ -200,20 +200,19 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 	}
 
 	@Override
-	@Retryable(value = RedisConnectionFailureException.class, maxAttempts = 3, recover = "getAllFormsFromDB", backoff = @Backoff(3000))
+	@Retryable(value = RedisConnectionFailureException.class, maxAttempts = 3, recover = "getAllFormsFromDB", backoff = @Backoff(1000))
 	public ResponseEntity<Response> getAllTemplateList() throws Exception {
-
-		logger.info("Started In getAllTemplateList() Service ");
+		logger.info("Started In getAllTemplateList() Service");
 
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> cachedFormList = redisService.get(Constants.KEY_FORM_NAMES, List.class);
 
 		if (null != cachedFormList) {
-			logger.info("Started In getAllTemplateList() Service Data From cache");
+			logger.info("Started In getAllTemplateList() Service - Data From Cache");
 			return Response.buildResponse(cachedFormList, HttpStatus.OK);
 		}
 
-		logger.info("Started In getAllTemplateList() Service DB call");
+		logger.info("Started In getAllTemplateList() Service - DB call");
 		List<Map<String, Object>> allFormNames = wfHelper.getAllFormNames();
 
 		if (!allFormNames.isEmpty()) {
@@ -225,29 +224,23 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 			}
 
 		}
-
+		logger.info("Exit From getAllTemplateList() Service");
 		return Response.buildResponse(allFormNames, HttpStatus.OK);
 	}
 
-	@Recover
-	public ResponseEntity<Response> getAllFormsFromDB(RedisConnectionFailureException e) {
-		logger.info(
-				"Started In getFormMetadataByFormId() Service Recovery Method calling for exception" + e.getMessage());
-		return Response.buildResponse(wfHelper.getAllFormNames(), HttpStatus.OK);
-	}
-
 	@Override
+	@Retryable(value = RedisConnectionFailureException.class, maxAttempts = 3, recover = "getFormMetadataFromDB", backoff = @Backoff(3000))
 	public ResponseEntity<Response> getFormMetadataByFormId(String formId) throws Exception {
-		logger.info("Started In getFormMetadataByFormId() Service ");
+		logger.info("Started In getFormMetadataByFormId() Service");
 
 		WirelessRequest cachedFormData = redisService.get(formId, WirelessRequest.class);
 
 		if (null != cachedFormData) {
-			logger.info("Started In getFormMetadataByFormId() Service Data From cache");
+			logger.info("Started In getFormMetadataByFormId() Service - Data From Cache");
 			return Response.buildResponse(cachedFormData, HttpStatus.OK);
 		}
 
-		logger.info("Started In getFormMetadataByFormId() Service DB call");
+		logger.info("Started In getFormMetadataByFormId() Service - DB call");
 		WirelessRequest dataFromDB = wirelessFormTemplateRepo.getFormMetadata(formId);
 
 		if (null != dataFromDB) {
@@ -259,6 +252,7 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 			}
 		}
 
+		logger.info("Exit From getFormMetadataByFormId() Service");
 		return Response.buildResponse(dataFromDB, HttpStatus.OK);
 	}
 
@@ -271,6 +265,19 @@ public class WirelessFormServiceImpl implements WirelessFormService {
 
 	public ResponseEntity<Response> getCustomGroup() {
 		return Response.buildResponse(customGroupRepo.findAll(), HttpStatus.OK);
+	}
+
+	// -----------------------------Recovery Methods
+	@Recover
+	public ResponseEntity<Response> getAllFormsFromDB(RedisConnectionFailureException e) {
+		logger.info("Started In getAllTemplateList() - Recovery Service Method Called, for exception" + e.getMessage());
+		return Response.buildResponse(wfHelper.getAllFormNames(), HttpStatus.OK);
+	}
+
+	@Recover
+	public ResponseEntity<Response> getFormMetadataFromDB(RedisConnectionFailureException e, String formId) {
+		logger.info("Started In getFormMetadataByFormId() - Recovery Service Method Called, for exception"+ e.getMessage());
+		return Response.buildResponse(wirelessFormTemplateRepo.getFormMetadata(formId), HttpStatus.OK);
 	}
 
 }

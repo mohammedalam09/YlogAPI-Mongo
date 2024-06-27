@@ -2,7 +2,9 @@ package com.ylog.entities;
 
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -21,10 +23,12 @@ public class WirelessRequest {
 	private String _id;
 	//private Long wirelessFormId;     //this is considering as PK here.
 	private Long companyId; 
-	@NotBlank(message = "should not be blank" )
+	@NotBlank
+	@NotEmpty
 	private String formName;
 	private String description;
 	private List<String> assignRoleIds;
+	@Valid
 	private List<WirelessFormMetaDataBean1> formMetadata;
 	private Long arrpovalProcessId;
 	private Long sequenceId;
@@ -35,6 +39,8 @@ public class WirelessRequest {
 	private String actionType;
 	private String formCode;
 	private Boolean isPublicForm;
+	@NotBlank
+	@NotEmpty
 	private String createdBy;
 	private String createdOn;
 	private String updatedBy;
