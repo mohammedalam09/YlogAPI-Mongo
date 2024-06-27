@@ -2,6 +2,7 @@ package com.ylog.entities;
 
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Transient;
@@ -10,95 +11,129 @@ import lombok.Data;
 
 @Data
 public class WirelessFormMetaDataBean1 {
-	
-	//This key is used for maintaining the sequence of the field on form
-	@NotNull(message = "sequence can not be null")
+
+	// This key is used for maintaining the sequence of the field on form
+	@NotNull
+	@NotEmpty
 	private Long sequence;
-	//This key is used for field label
+
+	// This key is used for field label
+	@NotNull
+	@NotEmpty
 	private String label;
-	//This key is used for field placeholder
+	// This key is used for field placeholder
 	private String placeholder;
-	//This key is used for field description
+
+	// This key is used for field description
 	private String description;
-	//This key is used for making this field mandatory on form submission
+
+	// This key is used for making this field mandatory on form submission
+	@NotNull
+	@NotEmpty
 	private Boolean isRequired;
-	//This key is used for making this field hidden on form
+
+	// This key is used for making this field hidden on form
+	@NotNull
+	@NotEmpty
 	private Boolean isVisibleLabel;
-	//This key is used for denotation that if any default value is assigned in this field or not
+
+	// This key is used for denotation that if any default value is assigned in this
+	// field or not
+	@NotNull
+	@NotEmpty
 	private Boolean isDefaultValue;
-	//This key is used for storing defaultValue
+
+	// This key is used for storing defaultValue
+	@NotNull
+	@NotEmpty
 	private String defaultValue;
+
 	private Boolean isEnableOtpVerification;
-	//This key is used for enabling read only field
-	private Boolean isEnableReadOnly; 
-	//This key is used for read only when(Add/Edit)
-	private List<String> enableReadOnlyValues; 
-	//This key is used for enabling validation on field
+
+	// This key is used for enabling read only field
+	@NotNull
+	@NotEmpty
+	private Boolean isEnableReadOnly;
+
+	// This key is used for read only when(Add/Edit)
+	@NotNull
+	@NotEmpty
+	private List<String> enableReadOnlyValues;
+
+	// This key is used for enabling validation on field
 	private String validation;
-	//This key is used for what validations are allowed to enter in this field
+	// This key is used for what validations are allowed to enter in this field
 	private String fieldContains;
-	//This key is used for custom error message here
-	private String errorMessage;  
-	//This key is used for dependable fields
+	// This key is used for custom error message here
+	private String errorMessage;
+	// This key is used for dependable fields
 	private String dependentOn;
-	//This key is used for parentEntity
+	// This key is used for parentEntity
 	private Long parentEntityId;
-	//This key is used for parentEntity
+	// This key is used for parentEntity
 	private Long childEntityId;
-	//This key is used for this field to show on Wirelessform Report
+	// This key is used for this field to show on Wirelessform Report
+	@NotNull
+	@NotEmpty
 	private Boolean isReportEnable;
-	//Below 3 keys are to support QRCode/BarCode for this field
+	// Below 3 keys are to support QRCode/BarCode for this field
 	private Boolean isEnableOcrScanning;
 	private Boolean isEnableQrcodeScanning;
 	private Boolean isEnableBarcodeScanning;
-	//This key is used for showing this fieldOn Add/Edit.
+	// This key is used for showing this fieldOn Add/Edit.
+	@NotNull
+	@NotEmpty
 	private String showFieldOn;
-	//This key is used for what case type is supported in this field.
+	// This key is used for what case type is supported in this field.
 	private String letterCase;
-	
-	//This key is used when someone chooses for GPS as location service.
+
+	// This key is used when someone chooses for GPS as location service.
 	private Boolean isLocationManager;
-	//This key is used when someone chooses for Google as location service.
+	// This key is used when someone chooses for Google as location service.
 	private Boolean isGoogle;
-	//This key is used when someone chooses for Geofence as location service.
+	// This key is used when someone chooses for Geofence as location service.
 	private Boolean isGeofence;
-	
-	//These fields are used for terms and conditions
+
+	// These fields are used for terms and conditions
 	private Boolean isUrl;
 	private Boolean isFixedLongText;
 	private Boolean isTermAcceptMandatory;
 	private Boolean isTermCollapsible;
 	private Boolean isTermSendEmail;
-	
+
 	private String longTextValue;
-	//This key is used for showing how many decimal places are allowed after decimal point.
+	// This key is used for showing how many decimal places are allowed after
+	// decimal point.
 	private String decimalScale;
-	//This key is used to represent the field editability
+	// This key is used to represent the field editability
 	private Boolean isEditable;
-	//Below two keys are used for AutoFill Functionality
-	// AutoFill Functionality :-Let's Say you have submitted data on any of the field on form previously and this field has AutoFieldKey enabled then when you again try the same value all   	AutoFieldValue will be fetched with previously submitted data and set automatically. 
+	// Below two keys are used for AutoFill Functionality
+	// AutoFill Functionality :-Let's Say you have submitted data on any of the
+	// field on form previously and this field has AutoFieldKey enabled then when
+	// you again try the same value all AutoFieldValue will be fetched with
+	// previously submitted data and set automatically.
 	private Boolean isPreFillKeyField;
 	private Boolean isPreFillField;
-	//This key represents minimum length that can be inserted into the field
+	// This key represents minimum length that can be inserted into the field
 	private Long fieldMinLength;
-	//This key represents maximum length that can be inserted into the field
+	// This key represents maximum length that can be inserted into the field
 	private Long FieldMaxLength;
-	
+
 	private Boolean isMaskingEnable;
 
 	private Boolean isScannerAvailable;
 	private Boolean isFact;
 	private Boolean isDimension;
-	//This key represents that this field will be visible on dataTable or not	
+	// This key represents that this field will be visible on dataTable or not
 	private Boolean isDataTableVisible;
-	
+
 	private Boolean isTotalField;
-	
+
 	private Long maskStartFrom;
 	private Long maskLength;
 	private Long minDiffenence;
 	private Long maxDiffenence;
-	
+
 	private String preFillWith;
 	private String sourceCondition;
 	private String containsValue;
@@ -126,12 +161,14 @@ public class WirelessFormMetaDataBean1 {
 //	private List<GroupMetadataRequest> groupMetadataList;
 	private Boolean isViewOnlyField; // if true field will be disabled on both add and update
 	private Boolean totalInFooter; // if true show total of field in footer
+	@NotNull
+	@NotEmpty
 	private String uiLabelKey;
 	private Boolean isTabularView;
+	@NotNull
+	@NotEmpty
 	private String fieldType;
 	@Transient
 	private List<Object> values;
-	
-
 
 }
