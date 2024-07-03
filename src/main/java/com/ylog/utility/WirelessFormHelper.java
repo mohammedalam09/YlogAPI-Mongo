@@ -61,27 +61,29 @@ public class WirelessFormHelper {
 
 		Query query = new Query(Criteria.where("formId").is(formId));
 	
-		ascCols.stream().forEach(a -> {
-
-			query.with(Sort.by(Sort.Direction.ASC, "formSubmittedData." + a));
-
-		});
-
-		descCols.stream().forEach(d -> {
-
-			query.with(Sort.by(Sort.Direction.DESC, "formSubmittedData." + d));
-		});
-
-		if (ascCols.isEmpty() && descCols.isEmpty()) {
-			// default search with submittedOn desc
-			query.with(Sort.by(Sort.Direction.DESC, "createdOn"));
-		}
+//		ascCols.stream().forEach(a -> {
+//
+//			query.with(Sort.by(Sort.Direction.ASC, "formSubmittedData." + a));
+//
+//		});
+//
+//		descCols.stream().forEach(d -> {
+//
+//			query.with(Sort.by(Sort.Direction.DESC, "formSubmittedData." + d));
+//		});
+//
+//		if (ascCols.isEmpty() && descCols.isEmpty()) {
+//			// default search with submittedOn desc
+//			query.with(Sort.by(Sort.Direction.DESC, "createdOn"));
+//		}
 
 		PageRequest page = PageRequest.of(pageNo, pageSize);
 
 		query.with(page);
 
 		query.fields().include("formSubmittedData");
+		
+		query.with(Sort.by(Sort.Direction.DESC, "createdOn"));
 
 		return mongoTemplate.find(query, WirelessFormData.class).stream().map(WirelessFormData::getFormSubmittedData)
 				.toList();

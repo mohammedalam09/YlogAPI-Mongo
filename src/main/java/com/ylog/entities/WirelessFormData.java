@@ -19,10 +19,14 @@ public class WirelessFormData {
 
 	@Id
 	private String _id;
-	@NotNull(message = "formId should not be null") @NotEmpty(message = "formId should not be empty")
+	@NotNull
+	@NotEmpty
 	private String formId;
+	@NotNull
 	private Long companyId;
 	private Map<String,Object> formSubmittedData;
+	@NotNull
+	@NotEmpty
 	private String createdBy;
 	private String createdOn;
 	private String updatedBy;

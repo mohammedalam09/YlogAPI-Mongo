@@ -19,7 +19,7 @@ public interface WirelessFormService {
 	ResponseEntity<Response> addWirelessFormSubmittedData(WirelessFormData wirelessFormData);
 
 	ResponseEntity<Response> viewWirelessFormSubmittedData(String formId, List<String> ascCols, List<String> descCols,
-			Integer pageNo, Integer pageSize);
+			Integer pageNo, Integer pageSize) throws Exception;
 
 	ResponseEntity<Response> deleteForm(List<String> formIds);
 

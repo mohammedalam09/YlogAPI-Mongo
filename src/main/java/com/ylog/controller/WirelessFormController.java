@@ -42,7 +42,8 @@ public class WirelessFormController {
 	@PostMapping("/template/addForm")
 	public ResponseEntity<Response> addWirelessFormTemplate(@RequestBody @Valid WirelessRequest wirelessRequest)
 			throws Exception {
-		logger.info("Start In addWirelessFormTemplate()");
+		logger.info(
+				"Started In addWirelessFormTemplate() Controller Where WirelessFormAddRequest is: " + wirelessRequest);
 
 		return wfService.addWirelessFormTemplate(wirelessRequest);
 
@@ -50,13 +51,14 @@ public class WirelessFormController {
 
 	@GetMapping("/template/dataTable")
 	public ResponseEntity<Response> viewAllWirelessFormTemplates() {
-		logger.info("Start In viewAllWirelessFormTemplates()");
+		logger.info("Started In viewAllWirelessFormTemplates() Controller");
 		return wfService.viewWirelessFormTemplates();
 
 	}
 
 	@GetMapping("/templateList")
 	public ResponseEntity<Response> getAllTemplateLists() {
+		logger.info("Started In getAllTemplateLists() Controller");
 
 		try {
 			return wfService.getAllTemplateList();
@@ -70,6 +72,7 @@ public class WirelessFormController {
 
 	@GetMapping("/template/metadata")
 	public ResponseEntity<Response> getFormMetadataByFormId(@RequestParam String formId) {
+		logger.info("Started In getFormMetadataByFormId() Controller Where FormId is: " + formId);
 		try {
 			return wfService.getFormMetadataByFormId(formId);
 		} catch (Exception e) {
@@ -80,6 +83,8 @@ public class WirelessFormController {
 
 	@PostMapping("/data/add")
 	public ResponseEntity<Response> addWirelessFormData(@RequestBody WirelessFormData wirelessFormData) {
+		logger.info(
+				"Started In addWirelessFormData() Controller Where wirelessFormSubmittedData is: " + wirelessFormData);
 
 		return wfService.addWirelessFormSubmittedData(wirelessFormData);
 
@@ -89,11 +94,18 @@ public class WirelessFormController {
 	public ResponseEntity<Response> viewWirelessFormSubmittedData(@RequestParam String formId,
 			@RequestParam(required = false, defaultValue = "") List<String> ascCols,
 			@RequestParam(required = false, defaultValue = "") List<String> descCols,
-			@RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize) {
+			@RequestParam(defaultValue = "0") Integer pageNo,
+			@RequestParam(defaultValue = Integer.MAX_VALUE + "") Integer pageSize) {
 
-		logger.info("Start In DataTable: " + new Date());
+		logger.info("Started In viewWirelessFormSubmittedData() Controller Where FormId is: " + formId);
 
-		return wfService.viewWirelessFormSubmittedData(formId, ascCols, descCols, pageNo, pageSize);
+		try {
+			return wfService.viewWirelessFormSubmittedData(formId, ascCols, descCols, pageNo, pageSize);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Response.buildResponse("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
