@@ -33,8 +33,9 @@ public class WirelessFormController {
 	@Value("${app.version}")
 	private String appVersion;
 
-	private Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
-	// Different logging levels TRACE<DEBUG<INFO<WARN<ERROR
+	// making it static and final to prevent this from sharing this logger instance
+	// accidentally with other class during execution
+	private static final Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
 
 	@Autowired
 	private WirelessFormService wfService;
@@ -117,7 +118,7 @@ public class WirelessFormController {
 
 	@GetMapping("/version")
 	public ResponseEntity<Response> getversion() {
-
+		logger.info("Started In getVersion()");
 		return Response.buildResponse(appVersion, HttpStatus.OK);
 	}
 
