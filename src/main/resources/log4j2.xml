@@ -3,20 +3,20 @@
     <Appenders>
         <!-- Console Appender for console output -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss.SSS} %p [%t] %2c.%M-%2L : %2m%n"/>
+            <PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss.SSS} %p---[%t]-%c.%M-%L : %m%n"/>
         </Console>
 
         <!-- RollingFile Appender for file output with rolling policies -->
         <RollingFile name="RollingFileAppender"
                      fileName="/home/jar_logs/app/ylog-mongo/logs/fastFormLog.log"
-                     filePattern="/home/jar_logs/app/ylog-mongo/logs/archieved-log/%d{dd-MMMM-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss.SSS} %p---[%t]-%2c.%M-%2L : %2m%n"/>
+                     filePattern="/home/jar_logs/app/ylog-mongo/logs/fastFormLog.log.%d{dd MMM}-%i">
+            <PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss.SSS} %p---[%t]-%c.%M-%L : %m%n"/>
             <Policies>
-                <OnStartupTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy size="5MB"/>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+               <!--  <OnStartupTriggeringPolicy/> -->
+                <SizeBasedTriggeringPolicy size="20MB"/>
+               <!--  <TimeBasedTriggeringPolicy interval="1" modulate="true"/> -->
             </Policies>
-            <DefaultRolloverStrategy max="10"/>
+            <DefaultRolloverStrategy max="30" />
         </RollingFile>
     </Appenders>
 
