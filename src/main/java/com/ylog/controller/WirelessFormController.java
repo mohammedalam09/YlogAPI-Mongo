@@ -1,6 +1,5 @@
 package com.ylog.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -34,7 +33,8 @@ public class WirelessFormController {
 	@Value("${app.version}")
 	private String appVersion;
 
-	private static Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
+	private Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
+	// Different logging levels TRACE<DEBUG<INFO<WARN<ERROR
 
 	@Autowired
 	private WirelessFormService wfService;
@@ -101,7 +101,7 @@ public class WirelessFormController {
 
 		try {
 			return wfService.viewWirelessFormSubmittedData(formId, ascCols, descCols, pageNo, pageSize);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
