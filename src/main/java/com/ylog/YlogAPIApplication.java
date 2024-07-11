@@ -12,7 +12,8 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 public class YlogAPIApplication {
 
-	private static Logger logger = LoggerFactory.getLogger(YlogAPIApplication.class);
+	// Making it static and final to prevent this from sharing this logger instance accidentally with other class during execution
+	private static final Logger logger = LoggerFactory.getLogger(YlogAPIApplication.class);
 
 	public static void main(String[] args) {
 

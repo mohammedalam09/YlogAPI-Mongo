@@ -32,9 +32,7 @@ public class WirelessFormController {
 
 	@Value("${app.version}")
 	private String appVersion;
-
-	// making it static and final to prevent this from sharing this logger instance
-	// accidentally with other class during execution
+	
 	private static final Logger logger = LoggerFactory.getLogger(WirelessFormController.class);
 
 	@Autowired
@@ -43,8 +41,7 @@ public class WirelessFormController {
 	@PostMapping("/template/addForm")
 	public ResponseEntity<Response> addWirelessFormTemplate(@RequestBody @Valid WirelessRequest wirelessRequest)
 			throws Exception {
-		logger.info(
-				"Started In addWirelessFormTemplate() Controller Where WirelessFormAddRequest is: " + wirelessRequest);
+		logger.info("Started In addWirelessFormTemplate() Controller Where WirelessFormAddRequest is: " + wirelessRequest);
 
 		return wfService.addWirelessFormTemplate(wirelessRequest);
 
