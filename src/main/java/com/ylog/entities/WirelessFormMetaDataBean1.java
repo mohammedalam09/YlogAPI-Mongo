@@ -14,7 +14,6 @@ public class WirelessFormMetaDataBean1 {
 
 	// This key is used for maintaining the sequence of the field on form
 	@NotNull
-	@NotEmpty
 	private Long sequence;
 
 	// This key is used for field label
@@ -29,18 +28,15 @@ public class WirelessFormMetaDataBean1 {
 
 	// This key is used for making this field mandatory on form submission
 	@NotNull
-	@NotEmpty
 	private Boolean isRequired;
 
 	// This key is used for making this field hidden on form
 	@NotNull
-	@NotEmpty
 	private Boolean isVisibleLabel;
 
 	// This key is used for denotation that if any default value is assigned in this
 	// field or not
 	@NotNull
-	@NotEmpty
 	private Boolean isDefaultValue;
 
 	// This key is used for storing defaultValue
@@ -52,7 +48,6 @@ public class WirelessFormMetaDataBean1 {
 
 	// This key is used for enabling read only field
 	@NotNull
-	@NotEmpty
 	private Boolean isEnableReadOnly;
 
 	// This key is used for read only when(Add/Edit)
@@ -72,9 +67,9 @@ public class WirelessFormMetaDataBean1 {
 	private Long parentEntityId;
 	// This key is used for parentEntity
 	private Long childEntityId;
+	
 	// This key is used for this field to show on Wirelessform Report
 	@NotNull
-	@NotEmpty
 	private Boolean isReportEnable;
 	// Below 3 keys are to support QRCode/BarCode for this field
 	private Boolean isEnableOcrScanning;
