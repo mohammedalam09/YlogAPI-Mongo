@@ -8,8 +8,8 @@
 
         <!-- RollingFile Appender for file output with rolling policies -->
         <RollingFile name="RollingFileAppender"
-                     fileName="/home/jar_logs/app/ylog-mongo/logs/fastFormLog.log"
-                     filePattern="/home/jar_logs/app/ylog-mongo/logs/fastFormLog.log.%d{dd MMM}-%i">
+                     fileName="/home/jar_logs/app/ylog-mongo/fastFormLog.log"
+                     filePattern="/home/jar_logs/app/ylog-mongo/fastFormLog.log.%d{dd MMM}-%i">
             <PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss.SSS} %p---[%t]-%c.%M-%L : %m%n"/>
             <Policies>
                <!--  <OnStartupTriggeringPolicy/> -->
